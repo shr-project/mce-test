@@ -1,0 +1,28 @@
+Notes for EDAC test:
+=========================
+1. During EDAC test, to avoid EDAC message lost, the value of ‘Correctable
+   Error Threshold’ BIOS setup option should be selected as 'ALL'. If the
+   'ALL' value isn't present in the selectable option value, you can do
+   according to the tips on the right side when ‘Correctable Error Threshold’
+   is selected, for example,
+   you can disable ‘ADDDC Sparing’ to let 'ALL' option be present:
+     Memory Configuration -> Memory RAS and Performance Configuration->ADDDC
+     Sparing <Disabled>
+     Memory Configuration -> Memory RAS and Performance Configuration->
+     Correctable Error Threshold <All>
+
+2. Disabling eMCA BIOS setup option before do EDAC test, otherwise, for one
+   address, two similar EDAC information may be received, one of them includes
+   incomplete machine check information on some platforms, such as invalid
+   MCE bank information as below,
+   "EDAC skx MC4: CPU 0: Machine Check Event: 0 Bank 255: 940000000000009f"
+
+3. If EDAC messages can't be received, e.g., 'received 0 EDAC messages in
+   total' is printed during test, there are two possible reasons:
+   a. 'CONFIG_RAS_CEC=y' is set in the running kernel configuration,  you can
+      work around it by adding 'ras=cec_disable' to kernel boot argument.
+   b. DDR4 DIMMs work as 'near' memory when PMEM exist and work in 'MemoryMode',
+      you can change 'Volatile Memory Mode' to '1LM' in BIOS to fix it.
+      e.g., "EDKII->Socket Configuration->Memory Configuration->Memory Map
+             ->Volatile Memory Mode <1LM>".
+   Of course, the above two reasons maybe cause other RAS test cases failure.

@@ -267,7 +267,8 @@ int main(int argc, char *argv[])
 			usleep(1000);
 			/* Wait for madvise() to be done */
 			if (get_semaphore(semid, &sembuffer))
-				err("put_semaphore");
+				err("get_semaphore");
+
 			if (put_semaphore(semid, &sembuffer))
 				err("put_semaphore");
 			return 0;
@@ -294,7 +295,7 @@ int main(int argc, char *argv[])
 		goto cleanout;
 	}
 
-	if (madvise_code != MADV_SOFT_OFFLINE);
+	if (madvise_code != MADV_SOFT_OFFLINE)
 		write_hugepage(addr, file_size, expected_addr);
 	read_hugepage(addr, file_size, expected_addr);
 

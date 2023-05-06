@@ -39,8 +39,10 @@ static int madvise_poison(void *addr, size_t length, int advice)
 sigjmp_buf recover_ctx;
 volatile int seq;
 
-void handler(int sig)
+void sighandler(int sig, siginfo_t *si, void *arg)
 {
+	printf("signal %d code %d addr %p\n", sig, si->si_code, si->si_addr);
+
 	siglongjmp(recover_ctx, 1);
 }
 
@@ -51,7 +53,11 @@ void test(int early)
 			 MAP_PRIVATE|MAP_ANONYMOUS|MAP_POPULATE, 0,0);
 	if (ptr == (char *)-1L)
 		err("mmap");
-	signal(SIGBUS, handler);
+	struct sigaction sa = {
+		.sa_sigaction = sighandler,
+		.sa_flags = SA_SIGINFO
+	};
+	sigaction(SIGBUS, &sa, NULL);
 	printf("ptr = %p\n", ptr);
 	if (sigsetjmp(recover_ctx, 1) == 0) { 
 		seq = 0;
